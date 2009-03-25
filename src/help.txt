@@ -1,0 +1,19 @@
+
+Welcome to Xatahi v1.0
+
+Available commands:
+
+  HELP
+  shows this help iformation
+
+  SERVER <host> [<port>]
+  connects to a server (the default port is 6667)
+
+  JOIN <channel>
+  joins the channel
+  
+  LEAVE [<reason>]
+  leave the channel
+
+  QUIT [<reason>]
+  disconnects from the current server
