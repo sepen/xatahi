@@ -6,6 +6,7 @@
 import pygtk
 pygtk.require("2.0")
 import gtk, gtk.glade
+import irc
 
  
 class Xatahi:
@@ -21,4 +22,6 @@ class Xatahi:
 
 if __name__ == "__main__":
 	x = Xatahi()
+	i = irc.Irc("mikeux.dyndns.org", 6667, "#mikeux", "xatahi")
+	i.connect()
 	gtk.main()
