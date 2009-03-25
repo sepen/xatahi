@@ -1,10 +1,15 @@
 #!/usr/bin/env python
+#
+# Xatahi: Tiny GTK2 client for IRC written in python
+
  
 import pygtk
 pygtk.require("2.0")
 import gtk, gtk.glade
+
  
 class Xatahi:
+	
 	def __init__(self):
 		self.glade = gtk.glade.XML("xatahi.glade")
 		self.glade.signal_autoconnect(self)
@@ -12,7 +17,8 @@ class Xatahi:
 		
 	def on_window1_delete_event(self, widget, event):
 		gtk.main_quit()
-	 
+
+
 if __name__ == "__main__":
 	x = Xatahi()
 	gtk.main()
