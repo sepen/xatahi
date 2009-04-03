@@ -8,7 +8,7 @@ pygtk.require("2.0")
 import gtk, gtk.glade
 from threading import Thread
 
- 
+
 class Gui(Thread):
 
 	xatahi = None
@@ -29,7 +29,6 @@ class Gui(Thread):
 		self.textviewcontents = ""
 
 	def run(self):
-		print "gtk thread iniciado"
 		gtk.main()
 
 	def quit(self):
@@ -55,27 +54,9 @@ class Gui(Thread):
 			widget.set_text("")
 			self.do_tasks(self.textentrycontents)
 
-	def do_tasks(self, string):
-		if string == "/h" or string == "/help":
-			self.show_help()
-		elif string == "/s" or string == "/server":
-			if self.xatahi.irc.status == "disconnected":
-				self.append_to_textview("\n\n===> Connecting to %s at port %s...\n" % (self.xatahi.irc.host, self.xatahi.irc.port))
-				self.xatahi.irc.connect_to_server()
-			else:
-				self.append_to_textview("**** You are connected to a server\n")
-		elif string == "/q" or string == "/quit":
-			self.xatahi.irc.quit()
-		elif string == "/j" or string == "/join":
-			if self.xatahi.irc.status == "connected" or self.xatahi.irc.status == "joined":
-				self.append_to_textview("\n\n===> Joinning to %s as %s...\n" % (self.xatahi.irc.channel, self.xatahi.irc.nick))
-				self.xatahi.irc.join_to_channel("#test")
-			else:
-				self.append_to_textview("**** You must connect to a server\n")
-		else:
-			if self.xatahi.irc.status == "connected" or self.xatahi.irc.status == "joined":
-				self.append_to_textview(">%s< %s\n" % (self.xatahi.irc.nick, string))
-				self.xatahi.irc.send_to_channel(string)
+	def do_tasks(self, line):
+		string = line
+		self.xatahi.commandline.do(line)
 
 
 # vim:ts=2 sw=2 noexpandtab

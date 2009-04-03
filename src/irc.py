@@ -3,8 +3,8 @@
 # IRC Class for Xatahi
 
 
-import os
-import sys
+#import os
+#import sys
 import socket
 import string
 import time
@@ -20,17 +20,17 @@ class Irc(Thread):
 	host, port, channel = None, None, None
 	nick, ident, realname = None, None, None
 
-	def __init__ (self, xatahi, host = "mikeux.dyndns.org", port = 6667, nick =  "xatahi"):
+	def __init__ (self, xatahi, host = "irc.freenode.org", port = 6667, nick = "xatahi"):
 		self.xatahi = xatahi
 		Thread.__init__(self)
 		self.status = "disconnected"
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		#self.s.setblocking(0)
 		self.host, self.port = host, port
 		self.nick, self.ident, self.realname = nick, nick, nick
 
 	def run(self):
-		while 1:
+		while self.xatahi.exit == 0:
+			time.sleep(1)
 			if self.status == "connected" or self.status == "joined":
 				buffer = None
 				buffer = self.read()
@@ -38,10 +38,15 @@ class Irc(Thread):
 					gtk.gdk.threads_enter()
 					self.xatahi.gui.append_to_textview(buffer)
 					gtk.gdk.threads_leave()
+		
 
 	def quit(self):
-		if self.status == "connected" or self.status == "joined":
+		try:
+			self.s.send("QUIT :Bye\r\n")
 			self.s.close()
+		except Exception, e:
+			print e
+			pass
 		self.status = "disconnected"
 
 	def read(self):
@@ -64,15 +69,12 @@ class Irc(Thread):
 	def connect_to_server(self):
 		if self.status == "disconnected":
 			try:
-				print "se esta conectando"
 				self.s.connect((self.host, self.port))
-				print "ya hizo el connect al server,port"
 				self.status = "connected"
 			except Exception, e:
 				print e
 				pass
 			try:
-				print "va a autenticarse"
 				self.s.send("NICK %s\r\n" % self.nick)
 				self.s.send("USER %s %s * :%s\r\n" % (self.ident, self.host, self.realname))
 			except Exception, e:

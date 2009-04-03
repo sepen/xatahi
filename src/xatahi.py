@@ -2,21 +2,22 @@
 #
 # Xatahi: Tiny GTK2 client for IRC written in python
 
- 
-import irc
-import gui
+
+import commandline, irc, gui
 from threading import Thread
 
  
 class Xatahi:
 
 	# global vars
-	version = "v1.0"
-	buffer = None
-	irc, gui = None, None
+	version = "0.1"
+	exit = None
+	commandline, irc, gui = None, None, None
 
 	def __init__(self):
+		self.exit = 0
 		# create objects
+		self.commandline = commandline.CommandLine(self);
 		self.irc = irc.Irc(self);
 		self.gui = gui.Gui(self);
 		# start threads
@@ -24,9 +25,7 @@ class Xatahi:
 		self.gui.start()
 
 	def quit(self):
-		# wait for threads
-		#self.irc.join()
-		#self.gui.join()
+		self.exit = 1;
 		# call to quit methods
 		self.irc.quit();
 		self.gui.quit();
