@@ -1,57 +1,102 @@
 #!/usr/bin/env python
+#
+# IRC Class for Xatahi
 
 
 import os
 import sys
 import socket
 import string
+import time
+from threading import Thread
+import gtk
+gtk.gdk.threads_init()
 
 
-class Irc:
+class Irc(Thread):
 
-	s, rbuffer, status = None, None, None
+	xatahi = None
+	s, status = None, None
 	host, port, channel = None, None, None
 	nick, ident, realname = None, None, None
 
-	def __init__ (self, host, port, channel, nick):
-		self.rbuffer = ""
+	def __init__ (self, xatahi, host = "mikeux.dyndns.org", port = 6667, nick =  "xatahi"):
+		self.xatahi = xatahi
+		Thread.__init__(self)
 		self.status = "disconnected"
-		self.host, self.port, self.channel = host, port, channel
-		self.nick, self.ident, self.realname = nick, nick, nick
 		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		#self.s.setblocking(0)
+		self.host, self.port = host, port
+		self.nick, self.ident, self.realname = nick, nick, nick
 
-	def close(self):
-		self.s.close()
+	def run(self):
+		while 1:
+			if self.status == "connected" or self.status == "joined":
+				buffer = None
+				buffer = self.read()
+				if buffer != None:
+					gtk.gdk.threads_enter()
+					self.xatahi.gui.append_to_textview(buffer)
+					gtk.gdk.threads_leave()
+
+	def quit(self):
+		if self.status == "connected" or self.status == "joined":
+			self.s.close()
 		self.status = "disconnected"
 
 	def read(self):
-		if self.status == "connected" or "joined":
-			self.rbuffer = self.s.recv(1024)
-			if self.rbuffer != None:
-				fields = self.rbuffer.split()
-				if fields[0] == "PING":
-					self.s.send("PONG " + fields[1])
+		buffer = None
+		try:
+			buffer = self.s.recv(1024)
+		except Exception, e:
+			print e
+			pass
+		if buffer != None:
+			fields = buffer.split()
+			if fields[0] == "PING":
+				self.s.send("PONG %s\r\n" % fields[1])
+		return buffer
 
 	def send(self, string):
-		if self.status == "connected" or "joined":
+		if self.status == "connected" or self.status == "joined":
 			self.s.send("%s\r\n", string)
 
-	def connect(self):
-		self.status = "disconnected"
-		self.s.connect((self.host, self.port))
-		self.s.send("NICK %s\r\n" % self.nick)
-		self.s.send("USER %s %s * :%s\r\n" % (self.ident, self.host, self.realname))
-		self.status = "connected"
-		self.read()
+	def connect_to_server(self):
+		if self.status == "disconnected":
+			try:
+				print "se esta conectando"
+				self.s.connect((self.host, self.port))
+				print "ya hizo el connect al server,port"
+				self.status = "connected"
+			except Exception, e:
+				print e
+				pass
+			try:
+				print "va a autenticarse"
+				self.s.send("NICK %s\r\n" % self.nick)
+				self.s.send("USER %s %s * :%s\r\n" % (self.ident, self.host, self.realname))
+			except Exception, e:
+				print e
+				pass
 
-	def join(self):
-		self.s.send("JOIN %s\r\n" % self.channel)
-		self.send_to_channel("lokooooooo")
-		self.status = "joined"
-		self.read()
+	def join_to_channel(self, channel = "#test"):
+		if self.status == "connected" or self.status == "joined":
+			try:
+				self.s.send("JOIN %s\r\n" % channel)
+				self.send_to_channel("lokooooooo")
+			except Exception, e:
+				print e
+				pass
+			self.channel = channel
+			self.status = "joined"
 
 	def send_to_channel(self, string):
 		if self.status == "connected" or self.status == "joined":
-			self.s.send("PRIVMSG %s :%s\r\n" % (self.channel, string))
+			try:
+				self.s.send("PRIVMSG %s :%s\r\n" % (self.channel, string))
+			except:
+				pass
 
+
+# vim:ts=2 sw=2 noexpandtab
 # End of file
