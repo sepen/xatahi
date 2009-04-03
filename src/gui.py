@@ -25,8 +25,6 @@ class Gui(Thread):
 		self.textentry = self.wTree.get_widget("entry1")
 		self.textview = self.wTree.get_widget("textview1")
 		self.textbuffer = self.textview.get_buffer()
-		self.textentrycontents = ""
-		self.textviewcontents = ""
 
 	def run(self):
 		gtk.main()
@@ -45,17 +43,17 @@ class Gui(Thread):
 		self.xatahi.quit()
 
 	def append_to_textview(self, line):
-		self.textviewcontents = self.textviewcontents + line
-		self.textbuffer.set_text(self.textviewcontents)
+		pos = self.textbuffer.get_end_iter()
+		self.textbuffer.insert(pos, line)
+		self.textview.scroll_to_mark(self.textbuffer.get_insert(), 0)
 
 	def on_entry1_enter_pressed(self, widget):
-		self.textentrycontents = widget.get_text()
-		if self.textentrycontents != None:
+		line = widget.get_text()
+		if line != None:
 			widget.set_text("")
-			self.do_tasks(self.textentrycontents)
+			self.do_tasks(line)
 
 	def do_tasks(self, line):
-		string = line
 		self.xatahi.commandline.do(line)
 
 
