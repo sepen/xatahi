@@ -13,8 +13,7 @@ class Gui(Thread):
 
 	xatahi = None
 	wTree = None
-	textentry, textentrycontents = None, None
-	textview, textbuffer, textviewcontents = None, None, None
+	textentry, textview, textbuffer = None, None, None
 
 	def __init__(self, xatahi):
 		self.xatahi = xatahi
