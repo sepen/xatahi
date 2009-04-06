@@ -25,7 +25,6 @@ class Xatahi:
 		self.gui.start()
 
 	def quit(self):
-		self.exit = 1;
 		# call to quit methods
 		self.irc.quit();
 		self.gui.quit();

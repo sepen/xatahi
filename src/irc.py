@@ -31,6 +31,7 @@ class Irc(Thread):
 	def run(self):
 		while self.xatahi.exit == 0:
 			time.sleep(1)
+			print self.status
 			if self.status == "connected" or self.status == "joined":
 				buffer = None
 				buffer = self.read()
@@ -43,11 +44,13 @@ class Irc(Thread):
 	def quit(self):
 		try:
 			self.s.send("QUIT :Bye\r\n")
+			self.status = "disconnected"
+			self.xatahi.exit = 1
+			time.sleep(2)
 			self.s.close()
 		except Exception, e:
 			print e
 			pass
-		self.status = "disconnected"
 
 	def read(self):
 		buffer = None
@@ -60,6 +63,7 @@ class Irc(Thread):
 			fields = buffer.split()
 			if fields[0] == "PING":
 				self.s.send("PONG %s\r\n" % fields[1])
+				buffer = None
 		return buffer
 
 	def send(self, string):
@@ -102,3 +106,4 @@ class Irc(Thread):
 
 # vim:ts=2 sw=2 noexpandtab
 # End of file
+
