@@ -18,16 +18,15 @@ class Xatahi:
 		self.exit = 0
 		# create objects
 		self.commandline = commandline.CommandLine(self);
-		self.irc = irc.Irc(self);
+		self.irc = irc.Irc(self, 'mikeux.dyndns.org', 6667, 'xatahi');
 		self.gui = gui.Gui(self);
-		# start threads
-		self.irc.start()
+		# start the app
 		self.gui.start()
 
 	def quit(self):
-		# call to quit methods
-		self.irc.quit();
-		self.gui.quit();
+		# call to quit
+		self.irc.quit()
+		self.gui.quit()
 
 
 if __name__ == "__main__":

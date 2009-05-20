@@ -7,7 +7,7 @@ import pygtk
 pygtk.require("2.0")
 import gtk, gtk.glade
 from threading import Thread
-
+gtk.gdk.threads_init()
 
 class Gui(Thread):
 
@@ -39,6 +39,7 @@ class Gui(Thread):
 			self.append_to_textview(string)
 
 	def on_window1_delete_event(self, widget, event):
+		self.xatahi.exit = 1
 		self.xatahi.quit()
 
 	def append_to_textview(self, line):
@@ -50,10 +51,7 @@ class Gui(Thread):
 		line = widget.get_text()
 		if line != None:
 			widget.set_text("")
-			self.do_tasks(line)
-
-	def do_tasks(self, line):
-		self.xatahi.commandline.do(line)
+			self.xatahi.commandline.do(line)
 
 
 # vim:ts=2 sw=2 noexpandtab
